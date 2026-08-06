@@ -26,4 +26,4 @@ COPY database ./database
 
 EXPOSE 8080
 
-CMD ["php", "-S", "0.0.0.0:8080", "-t", "public"]
+CMD ["sh", "bin/start.sh"]
