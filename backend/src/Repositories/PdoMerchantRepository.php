@@ -45,4 +45,38 @@ class PdoMerchantRepository implements MerchantRepositoryInterface
             $merchantData['payment_provider']
         );
     }
+    public function create($merchant)
+    {
+        $statement = $this->connection->prepare(
+            'INSERT INTO merchants (
+            name,
+            email,
+            password_hash,
+            payment_provider
+        ) VALUES (
+            :name,
+            :email,
+            :password_hash,
+            :payment_provider
+        )
+        RETURNING id'
+        );
+
+        $statement->execute([
+            'name' => $merchant->getName(),
+            'email' => $merchant->getEmail(),
+            'password_hash' => $merchant->getPasswordHash(),
+            'payment_provider' => $merchant->getPaymentProvider(),
+        ]);
+
+        $merchantId = $statement->fetchColumn();
+
+        return new Merchant(
+            $merchantId,
+            $merchant->getName(),
+            $merchant->getEmail(),
+            $merchant->getPasswordHash(),
+            $merchant->getPaymentProvider()
+        );
+    }
 }
