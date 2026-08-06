@@ -15,6 +15,59 @@ $connection->exec(
     )'
 );
 
-echo "Migration table is ready." . PHP_EOL;
+$migrationsPath = dirname(__DIR__) . '/database/migrations';
+$migrationFiles = glob($migrationsPath . '/*.sql');
 
-// TODO: find and execute pending migration files
+if (!$migrationFiles) {
+    echo "No migration files found." . PHP_EOL;
+    exit;
+}
+
+sort($migrationFiles);
+
+$statement = $connection->query(
+    'SELECT migration FROM migrations ORDER BY id'
+);
+
+$executedMigrations = $statement->fetchAll(PDO::FETCH_COLUMN);
+
+foreach ($migrationFiles as $migrationFile) {
+    $migrationName = basename($migrationFile);
+
+    if (in_array($migrationName, $executedMigrations)) {
+        continue;
+    }
+
+    $sql = file_get_contents($migrationFile);
+
+    if ($sql === false) {
+        throw new RuntimeException(
+            "Could not read migration: {$migrationName}"
+        );
+    }
+
+    $connection->beginTransaction();
+
+    try {
+        $connection->exec($sql);
+
+        $statement = $connection->prepare(
+            'INSERT INTO migrations (migration)
+             VALUES (:migration)'
+        );
+
+        $statement->execute([
+            'migration' => $migrationName,
+        ]);
+
+        $connection->commit();
+
+        echo "Executed migration: {$migrationName}" . PHP_EOL;
+    } catch (Throwable $exception) {
+        $connection->rollBack();
+
+        throw $exception;
+    }
+}
+
+echo "Migrations are up to date." . PHP_EOL;
