@@ -22,6 +22,7 @@ COPY --from=dependencies /app/vendor ./vendor
 COPY public ./public
 COPY src ./src
 COPY bin ./bin
+COPY database ./database
 
 EXPOSE 8080
 
