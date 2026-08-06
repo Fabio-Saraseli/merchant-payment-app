@@ -21,6 +21,7 @@ WORKDIR /app
 COPY --from=dependencies /app/vendor ./vendor
 COPY public ./public
 COPY src ./src
+COPY bin ./bin
 
 EXPOSE 8080
 
