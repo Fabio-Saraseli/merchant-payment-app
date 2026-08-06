@@ -4,6 +4,15 @@ services:
       context: ./backend
     ports:
       - "8080:8080"
+    environment:
+      DB_HOST: database
+      DB_PORT: 5432
+      DB_NAME: merchant_payments
+      DB_USER: merchant_app
+      DB_PASSWORD: merchant_password
+    depends_on:
+      database:
+        condition: service_healthy
 
   database:
     image: postgres:17-alpine
