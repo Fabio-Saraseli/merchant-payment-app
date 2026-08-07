@@ -8,6 +8,12 @@ use App\Core\Database;
 use App\Repositories\PdoApiTokenRepository;
 use App\Repositories\PdoMerchantRepository;
 use App\Services\AuthService;
+use App\Auth\BearerAuthenticator;
+use App\Controllers\PaymentController;
+use App\Payments\FakeStripeProvider;
+use App\Payments\PaymentProviderResolver;
+use App\Repositories\PdoTransactionRepository;
+use App\Services\PaymentService;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
@@ -27,20 +33,42 @@ $connection = (new Database())->connect();
 
 $merchantRepository = new PdoMerchantRepository($connection);
 $apiTokenRepository = new PdoApiTokenRepository($connection);
+$transactionRepository = new PdoTransactionRepository($connection);
 
 $authService = new AuthService(
     $merchantRepository,
     $apiTokenRepository
 );
 
+$bearerAuthenticator = new BearerAuthenticator($authService);
+
+$paymentProviderResolver = new PaymentProviderResolver([
+    'fake_stripe' => new FakeStripeProvider(),
+]);
+
+$paymentService = new PaymentService(
+    $transactionRepository,
+    $paymentProviderResolver
+);
+
 $healthController = new HealthController($view);
 $authController = new AuthController($authService, $view);
+$paymentController = new PaymentController(
+    $paymentService,
+    $bearerAuthenticator,
+    $view
+);
 
 $router->get('/', [$healthController, 'index']);
 
 $router->post('/api/auth/login', [
     $authController,
     'login'
+]);
+
+$router->post('/api/payments', [
+    $paymentController,
+    'charge'
 ]);
 
 $router->dispatch(
