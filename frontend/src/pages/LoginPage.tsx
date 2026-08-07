@@ -1,43 +1,15 @@
-import { useState } from "react";
-import { loginMerchant } from "../api/auth";
-import { useNavigate } from "react-router-dom";
+import { useLogin } from "../hooks/useLogin";
 
 function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const navigate = useNavigate();
-
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    setErrorMessage("");
-
-    if (!email.trim() || !password.trim()) {
-      setErrorMessage("Email and password required");
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    const result = await loginMerchant({
-      email,
-      password,
-    });
-
-    setIsSubmitting(false);
-
-    if (!result.success) {
-      setErrorMessage(result.message);
-      return;
-    }
-
-    localStorage.setItem("merchant_token", result.token);
-    localStorage.setItem("merchant", JSON.stringify(result.merchant));
-    localStorage.setItem("token_expires_at", result.expires_at);
-    navigate("/dashboard");
-  };
+  const {
+    email,
+    setEmail,
+    password,
+    setPassword,
+    errorMessage,
+    isSubmitting,
+    handleSubmit,
+  } = useLogin();
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-8 sm:px-6 lg:px-8">

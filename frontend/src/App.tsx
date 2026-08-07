@@ -2,14 +2,21 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardPage from "./pages/DashboardPage";
 import LoginPage from "./pages/LoginPage";
+import PublicRoute from "./components/PublicRoute";
 
 function App() {
   const token = localStorage.getItem("merchant_token");
-  //localStorage.clear()
 
   return (
     <Routes>
-      <Route path="/login" element={<LoginPage />} />
+      <Route
+        path="/login"
+        element={
+          <PublicRoute>
+            <LoginPage />
+          </PublicRoute>
+        }
+      />
 
       <Route
         path="/dashboard"
