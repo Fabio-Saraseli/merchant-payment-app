@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import PaymentForm from "../components/PaymentForm";
 
 function DashboardPage() {
   const navigate = useNavigate();
@@ -12,7 +13,7 @@ function DashboardPage() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-50">
+     <main className="min-h-screen bg-slate-50">
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
           <div className="text-left">
@@ -21,11 +22,13 @@ function DashboardPage() {
             </p>
 
             <h1 className="text-xl font-semibold text-slate-900 sm:text-2xl">
-              {merchant?.name || "Dashboard"}
+              {merchant?.name || 'Dashboard'}
             </h1>
 
             {merchant?.email && (
-              <p className="mt-1 text-sm text-slate-500">{merchant.email}</p>
+              <p className="mt-1 text-sm text-slate-500">
+                {merchant.email}
+              </p>
             )}
           </div>
 
@@ -39,15 +42,9 @@ function DashboardPage() {
         </div>
       </header>
 
-      <section className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
-        <div className="rounded-xl border border-slate-200 bg-white p-5 text-left shadow-sm sm:p-6">
-          <h2 className="text-lg font-semibold text-slate-900">Payments</h2>
-
-          <p className="mt-2 text-sm text-slate-500">
-            Create payments and review your transaction history.
-          </p>
-        </div>
-      </section>
+      <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+        <PaymentForm />
+      </div>
     </main>
   );
 }
