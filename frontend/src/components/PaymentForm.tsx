@@ -1,50 +1,26 @@
-import { useState } from "react";
 import { handleCvvChange } from "../helpers/handleCvvChange";
 import { handleExpiryChange } from "../helpers/handleExpiryChange";
 import { handleCardNumberChange } from "../helpers/handleCardNumberChange";
+import { useSubmitPayment } from "../hooks/useSubmitPayment";
 
 function PaymentForm() {
-  const [amount, setAmount] = useState("");
-  const [description, setDescription] = useState("");
-  const [cardNumber, setCardNumber] = useState("");
-  const [expiry, setExpiry] = useState("");
-  const [cvv, setCvv] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setErrorMessage("");
-
-    const cardDigits = cardNumber.replace(/\s/g, "");
-
-    if (!cardDigits || !expiry || !cvv || !amount || !description.trim()) {
-      setErrorMessage("All fields are required");
-      return;
-    }
-
-    if (cardDigits.length !== 16) {
-      setErrorMessage("Card number must contain 16 digits");
-      return;
-    }
-
-    if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiry)) {
-      setErrorMessage("Expiry date must use MM/YY format");
-      return;
-    }
-
-    if (cvv.length < 3) {
-      setErrorMessage("CVV must contain at least 3 digits");
-      return;
-    }
-
-    if (Number(amount) <= 0) {
-      setErrorMessage("Amount must be greater than 0");
-      return;
-    }
-
-    // TODO: need to submit form data to BE
-  };
-
+  const {
+    amount,
+    setAmount,
+    description,
+    setDescription,
+    cardNumber,
+    setCardNumber,
+    expiry,
+    setExpiry,
+    cvv,
+    setCvv,
+    errorMessage,
+    isSubmitting,
+    paymentMessage,
+    handleSubmit,
+  } = useSubmitPayment();
+  
   return (
     <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
       <div className="text-left">
@@ -173,11 +149,18 @@ function PaymentForm() {
           </div>
         )}
 
+        {paymentMessage && (
+          <div className="rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-left text-sm text-green-700">
+            {paymentMessage}
+          </div>
+        )}
+
         <button
           type="submit"
-          className="w-full rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800 sm:w-auto"
+          disabled={isSubmitting}
+          className="w-full rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
         >
-          Charge Card
+          {isSubmitting ? "Processing..." : "Charge Card"}
         </button>
       </form>
     </section>
