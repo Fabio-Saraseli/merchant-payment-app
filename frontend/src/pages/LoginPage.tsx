@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { loginMerchant } from "../api/auth";
+import { useNavigate } from "react-router-dom";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -33,6 +35,7 @@ function LoginPage() {
 
     localStorage.setItem("merchant_token", result.token);
     localStorage.setItem("merchant", JSON.stringify(result.merchant));
+    navigate("/dashboard");
   };
 
   return (
