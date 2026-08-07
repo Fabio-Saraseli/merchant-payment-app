@@ -79,4 +79,37 @@ class PdoMerchantRepository implements MerchantRepositoryInterface
             $merchant->getPaymentProvider()
         );
     }
+
+    public function findById($id)
+    {
+        $statement = $this->connection->prepare(
+            'SELECT
+                id,
+                name,
+                email,
+                password_hash,
+                payment_provider
+             FROM merchants
+             WHERE id = :id
+             LIMIT 1'
+        );
+
+        $statement->execute([
+            'id' => $id,
+        ]);
+
+        $merchantData = $statement->fetch();
+
+        if (!$merchantData) {
+            return null;
+        }
+
+        return new Merchant(
+            $merchantData['id'],
+            $merchantData['name'],
+            $merchantData['email'],
+            $merchantData['password_hash'],
+            $merchantData['payment_provider']
+        );
+    }
 }

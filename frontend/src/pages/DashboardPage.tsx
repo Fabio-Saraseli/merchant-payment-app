@@ -1,19 +1,53 @@
+import { useNavigate } from "react-router-dom";
+
 function DashboardPage() {
+  const navigate = useNavigate();
+  const storedMerchant = localStorage.getItem("merchant");
+  const merchant = storedMerchant ? JSON.parse(storedMerchant) : null;
+
+  const handleLogout = () => {
+    localStorage.removeItem("merchant_token");
+    localStorage.removeItem("merchant");
+    navigate("/login");
+  };
+
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
-      <div className="mx-auto w-full max-w-7xl">
-        <header className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-          <p className="text-sm font-medium text-slate-500">Merchant Portal</p>
+    <main className="min-h-screen bg-slate-50">
+      <header className="border-b border-slate-200 bg-white">
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+          <div className="text-left">
+            <p className="text-sm font-medium text-slate-500">
+              Merchant Portal
+            </p>
 
-          <h1 className="mt-1 text-2xl font-semibold text-slate-900 sm:text-3xl">
-            Dashboard
-          </h1>
+            <h1 className="text-xl font-semibold text-slate-900 sm:text-2xl">
+              {merchant?.name || "Dashboard"}
+            </h1>
 
-          <p className="mt-2 text-sm text-slate-500 sm:text-base">
-            Manage your payments and transactions.
+            {merchant?.email && (
+              <p className="mt-1 text-sm text-slate-500">{merchant.email}</p>
+            )}
+          </div>
+
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 sm:w-auto"
+          >
+            Logout
+          </button>
+        </div>
+      </header>
+
+      <section className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+        <div className="rounded-xl border border-slate-200 bg-white p-5 text-left shadow-sm sm:p-6">
+          <h2 className="text-lg font-semibold text-slate-900">Payments</h2>
+
+          <p className="mt-2 text-sm text-slate-500">
+            Create payments and review your transaction history.
           </p>
-        </header>
-      </div>
+        </div>
+      </section>
     </main>
   );
 }

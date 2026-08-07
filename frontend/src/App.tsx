@@ -4,6 +4,8 @@ import DashboardPage from "./pages/DashboardPage";
 import LoginPage from "./pages/LoginPage";
 
 function App() {
+  const token = localStorage.getItem("merchant_token");
+
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
@@ -17,7 +19,10 @@ function App() {
         }
       />
 
-      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route
+        path="/"
+        element={<Navigate to={token ? "/dashboard" : "/login"} replace />}
+      />
     </Routes>
   );
 }
