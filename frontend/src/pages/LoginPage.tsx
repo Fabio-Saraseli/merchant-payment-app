@@ -35,6 +35,7 @@ function LoginPage() {
 
     localStorage.setItem("merchant_token", result.token);
     localStorage.setItem("merchant", JSON.stringify(result.merchant));
+    localStorage.setItem("token_expires_at", result.expires_at);
     navigate("/dashboard");
   };
 

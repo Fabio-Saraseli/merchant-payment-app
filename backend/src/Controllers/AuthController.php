@@ -53,6 +53,7 @@ class AuthController
 
         $this->view->render([
             'token' => $result['token'],
+            'expires_at' => $result['expires_at'],
             'merchant' => [
                 'id' => $merchant->getId(),
                 'name' => $merchant->getName(),

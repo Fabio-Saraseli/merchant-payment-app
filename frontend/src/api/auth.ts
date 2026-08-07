@@ -10,6 +10,7 @@ type Merchant = {
 };
 
 type LoginSuccess = {
+  expires_at: string;
   success: true;
   token: string;
   merchant: Merchant;
@@ -46,6 +47,7 @@ export async function loginMerchant(
     return {
       success: true,
       token: data.token,
+      expires_at: data.expires_at,
       merchant: data.merchant,
     };
   } catch {

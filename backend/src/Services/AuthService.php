@@ -30,7 +30,9 @@ class AuthService
         $plainToken = bin2hex(random_bytes(32));
         $tokenHash = hash('sha256', $plainToken);
 
-        $expiresAt = gmdate('Y-m-d H:i:s', time() + 3600); //After 1 hour
+        $expiresAtTimestamp = time() + 3600;
+        $expiresAt = gmdate('Y-m-d H:i:s', $expiresAtTimestamp);
+        $expiresAtIso = gmdate('Y-m-d\TH:i:s\Z', $expiresAtTimestamp);
 
         $apiToken = new ApiToken(
             null,
@@ -43,6 +45,7 @@ class AuthService
 
         return [
             'token' => $plainToken,
+            'expires_at' => $expiresAtIso,
             'merchant' => $merchant,
         ];
     }

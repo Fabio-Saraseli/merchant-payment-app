@@ -5,6 +5,7 @@ import LoginPage from "./pages/LoginPage";
 
 function App() {
   const token = localStorage.getItem("merchant_token");
+  //localStorage.clear()
 
   return (
     <Routes>
