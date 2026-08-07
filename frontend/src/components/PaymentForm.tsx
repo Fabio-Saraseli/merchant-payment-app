@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { handleCvvChange } from "../helpers/handleCvvChange";
+import { handleExpiryChange } from "../helpers/handleExpiryChange";
+import { handleCardNumberChange } from "../helpers/handleCardNumberChange";
 
 function PaymentForm() {
   const [amount, setAmount] = useState("");
@@ -6,9 +9,38 @@ function PaymentForm() {
   const [cardNumber, setCardNumber] = useState("");
   const [expiry, setExpiry] = useState("");
   const [cvv, setCvv] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setErrorMessage("");
+
+    const cardDigits = cardNumber.replace(/\s/g, "");
+
+    if (!cardDigits || !expiry || !cvv || !amount || !description.trim()) {
+      setErrorMessage("All fields are required");
+      return;
+    }
+
+    if (cardDigits.length !== 16) {
+      setErrorMessage("Card number must contain 16 digits");
+      return;
+    }
+
+    if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiry)) {
+      setErrorMessage("Expiry date must use MM/YY format");
+      return;
+    }
+
+    if (cvv.length < 3) {
+      setErrorMessage("CVV must contain at least 3 digits");
+      return;
+    }
+
+    if (Number(amount) <= 0) {
+      setErrorMessage("Amount must be greater than 0");
+      return;
+    }
 
     // TODO: need to submit form data to BE
   };
@@ -41,7 +73,8 @@ function PaymentForm() {
               inputMode="numeric"
               autoComplete="cc-number"
               value={cardNumber}
-              onChange={(event) => setCardNumber(event.target.value)}
+              onChange={(event) => handleCardNumberChange(event, setCardNumber)}
+              maxLength={19}
               placeholder="4242 4242 4242 4242"
               className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-500"
             />
@@ -61,7 +94,8 @@ function PaymentForm() {
               inputMode="numeric"
               autoComplete="cc-exp"
               value={expiry}
-              onChange={(event) => setExpiry(event.target.value)}
+              onChange={(event) => handleExpiryChange(event, setExpiry)}
+              maxLength={5}
               placeholder="MM/YY"
               className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-500"
             />
@@ -81,7 +115,8 @@ function PaymentForm() {
               inputMode="numeric"
               autoComplete="cc-csc"
               value={cvv}
-              onChange={(event) => setCvv(event.target.value)}
+              onChange={(event) => handleCvvChange(event, setCvv)}
+              maxLength={4}
               placeholder="123"
               className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-500"
             />
@@ -131,6 +166,12 @@ function PaymentForm() {
             className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-500"
           />
         </div>
+
+        {errorMessage && (
+          <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-left text-sm text-red-700">
+            {errorMessage}
+          </div>
+        )}
 
         <button
           type="submit"
