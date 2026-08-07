@@ -1,13 +1,18 @@
 <?php
 
-declare(strict_types=1);
-
 use App\Controllers\HealthController;
+use App\Core\Router;
 use App\Views\JsonView;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
-$view = new JsonView();
-$controller = new HealthController($view);
+$router = new Router();
 
-$controller->index();
+$healthController = new HealthController(new JsonView());
+
+$router->get('/', [$healthController, 'index']);
+
+$router->dispatch(
+    $_SERVER['REQUEST_METHOD'],
+    $_SERVER['REQUEST_URI']
+);
