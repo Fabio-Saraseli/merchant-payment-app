@@ -1,5 +1,7 @@
+import LoginPage from './pages/LoginPage'
+
 function App() {
-  return <section></section>;
+  return <LoginPage />
 }
 
-export default App;
+export default App
