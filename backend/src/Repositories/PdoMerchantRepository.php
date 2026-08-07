@@ -84,14 +84,14 @@ class PdoMerchantRepository implements MerchantRepositoryInterface
     {
         $statement = $this->connection->prepare(
             'SELECT
-                id,
-                name,
-                email,
-                password_hash,
-                payment_provider
-             FROM merchants
-             WHERE id = :id
-             LIMIT 1'
+            id,
+            name,
+            email,
+            password_hash,
+            payment_provider
+         FROM merchants
+         WHERE id = :id
+         LIMIT 1'
         );
 
         $statement->execute([

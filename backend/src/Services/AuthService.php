@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Services;
+
 use App\Models\ApiToken;
 
 class AuthService
@@ -29,7 +30,7 @@ class AuthService
         $plainToken = bin2hex(random_bytes(32));
         $tokenHash = hash('sha256', $plainToken);
 
-        $expiresAt = gmdate('Y-m-d H:i:s', time() + 3600);//After 1 hour
+        $expiresAt = gmdate('Y-m-d H:i:s', time() + 3600); //After 1 hour
 
         $apiToken = new ApiToken(
             null,
@@ -44,5 +45,27 @@ class AuthService
             'token' => $plainToken,
             'merchant' => $merchant,
         ];
+    }
+    public function authenticateToken($plainToken)
+    {
+        if (!$plainToken) {
+            return null;
+        }
+
+        $tokenHash = hash('sha256', $plainToken);
+
+        $apiToken = $this->apiTokenRepository->findByTokenHash($tokenHash);
+
+        if (!$apiToken) {
+            return null;
+        }
+
+        if (strtotime($apiToken->getExpiresAt()) <= time()) {
+            return null;
+        }
+
+        return $this->merchantRepository->findById(
+            $apiToken->getMerchantId()
+        );
     }
 }
