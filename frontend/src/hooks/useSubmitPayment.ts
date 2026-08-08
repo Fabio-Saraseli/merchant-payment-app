@@ -1,5 +1,10 @@
 import { useState } from "react";
 import { createPayment } from "../api/payments";
+import {
+  formatCardNumber,
+  formatCvv,
+  formatExpiry,
+} from "../helpers/cardHelpers";
 
 export function useSubmitPayment() {
   const [amount, setAmount] = useState("");
@@ -10,6 +15,20 @@ export function useSubmitPayment() {
   const [errorMessage, setErrorMessage] = useState("");
   const [paymentMessage, setPaymentMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleCardNumberChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setCardNumber(formatCardNumber(event.target.value));
+  };
+
+  const handleExpiryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setExpiry(formatExpiry(event.target.value));
+  };
+
+  const handleCvvChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setCvv(formatCvv(event.target.value));
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -62,7 +81,9 @@ export function useSubmitPayment() {
     }
 
     setPaymentMessage(
-      `Payment of €${(result.transaction.amount_cents / 100).toFixed(2)} succeeded`,
+      `Payment of €${(result.transaction.amount_cents / 100).toFixed(
+        2,
+      )} succeeded`,
     );
 
     setCardNumber("");
@@ -78,14 +99,14 @@ export function useSubmitPayment() {
     description,
     setDescription,
     cardNumber,
-    setCardNumber,
     expiry,
-    setExpiry,
     cvv,
-    setCvv,
     errorMessage,
-    isSubmitting,
     paymentMessage,
+    isSubmitting,
+    handleCardNumberChange,
+    handleExpiryChange,
+    handleCvvChange,
     handleSubmit,
   };
 }

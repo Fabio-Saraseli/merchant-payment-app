@@ -1,7 +1,7 @@
-import { handleCvvChange } from "../helpers/handleCvvChange";
-import { handleExpiryChange } from "../helpers/handleExpiryChange";
-import { handleCardNumberChange } from "../helpers/handleCardNumberChange";
 import { useSubmitPayment } from "../hooks/useSubmitPayment";
+import Alert from "./ui/Alert";
+import FormField from "./ui/FormField";
+import Input from "./ui/Input";
 
 function PaymentForm() {
   const {
@@ -10,14 +10,14 @@ function PaymentForm() {
     description,
     setDescription,
     cardNumber,
-    setCardNumber,
     expiry,
-    setExpiry,
     cvv,
-    setCvv,
     errorMessage,
     isSubmitting,
     paymentMessage,
+    handleCardNumberChange,
+    handleExpiryChange,
+    handleCvvChange,
     handleSubmit,
   } = useSubmitPayment();
 
@@ -35,125 +35,78 @@ function PaymentForm() {
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-5">
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-          <div className="text-left">
-            <label
-              htmlFor="cardNumber"
-              className="mb-2 block text-sm font-medium text-slate-700"
-            >
-              Card Number
-            </label>
-
-            <input
+          <FormField label="Card Number" htmlFor="cardNumber">
+            <Input
               id="cardNumber"
               type="text"
               inputMode="numeric"
               autoComplete="cc-number"
               value={cardNumber}
-              onChange={(event) => handleCardNumberChange(event, setCardNumber)}
+              onChange={handleCardNumberChange}
               maxLength={19}
               placeholder="4242 4242 4242 4242"
-              className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-500"
             />
-          </div>
+          </FormField>
 
-          <div className="text-left">
-            <label
-              htmlFor="expiry"
-              className="mb-2 block text-sm font-medium text-slate-700"
-            >
-              Expiry Date
-            </label>
-
-            <input
+          <FormField label="Expiry Date" htmlFor="expiry">
+            <Input
               id="expiry"
               type="text"
               inputMode="numeric"
               autoComplete="cc-exp"
               value={expiry}
-              onChange={(event) => handleExpiryChange(event, setExpiry)}
+              onChange={handleExpiryChange}
               maxLength={5}
               placeholder="MM/YY"
-              className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-500"
             />
-          </div>
+          </FormField>
 
-          <div className="text-left">
-            <label
-              htmlFor="cvv"
-              className="mb-2 block text-sm font-medium text-slate-700"
-            >
-              CVV
-            </label>
-
-            <input
+          <FormField label="CVV" htmlFor="cvv">
+            <Input
               id="cvv"
               type="password"
               inputMode="numeric"
               autoComplete="cc-csc"
               value={cvv}
-              onChange={(event) => handleCvvChange(event, setCvv)}
+              onChange={handleCvvChange}
               maxLength={4}
               placeholder="123"
-              className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-500"
             />
-          </div>
+          </FormField>
 
-          <div className="text-left">
-            <label
-              htmlFor="amount"
-              className="mb-2 block text-sm font-medium text-slate-700"
-            >
-              Amount
-            </label>
-
+          <FormField label="Amount" htmlFor="amount">
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">
                 €
               </span>
 
-              <input
+              <Input
                 id="amount"
                 type="number"
-                min="0"
+                min="0.01"
                 step="0.01"
                 value={amount}
                 onChange={(event) => setAmount(event.target.value)}
                 placeholder="0.00"
-                className="w-full rounded-lg border border-slate-300 py-2.5 pl-8 pr-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-500"
+                className="pl-8"
               />
             </div>
-          </div>
+          </FormField>
         </div>
 
-        <div className="text-left">
-          <label
-            htmlFor="description"
-            className="mb-2 block text-sm font-medium text-slate-700"
-          >
-            Description
-          </label>
-
-          <input
+        <FormField label="Description" htmlFor="description">
+          <Input
             id="description"
             type="text"
             value={description}
             onChange={(event) => setDescription(event.target.value)}
             placeholder="Payment description"
-            className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-500"
           />
-        </div>
+        </FormField>
 
-        {errorMessage && (
-          <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-left text-sm text-red-700">
-            {errorMessage}
-          </div>
-        )}
+        {errorMessage && <Alert type="error" message={errorMessage} />}
 
-        {paymentMessage && (
-          <div className="rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-left text-sm text-green-700">
-            {paymentMessage}
-          </div>
-        )}
+        {paymentMessage && <Alert type="success" message={paymentMessage} />}
 
         <button
           type="submit"
