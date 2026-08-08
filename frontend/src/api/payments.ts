@@ -1,4 +1,4 @@
-import { API_BASE_URL } from "../constants";
+import { apiRequest } from "./apiClient";
 
 type PaymentData = {
   card_number: string;
@@ -8,57 +8,25 @@ type PaymentData = {
   description: string;
 };
 
-export type Transaction = {
-  id: number;
-  amount_cents: number;
-  currency: string;
-  description: string;
-  card_last_four: string;
-  status: string;
-  provider_transaction_id: string | null;
-  created_at: string;
-};
+
 
 export async function createPayment(paymentData: PaymentData) {
-  const token = localStorage.getItem("merchant_token");
+  const result = await apiRequest("/payments", {
+    method: "POST",
+    authenticated: true,
+    body: JSON.stringify(paymentData),
+  });
 
-  if (!token) {
+  if (!result.ok) {
     return {
       success: false,
-      message: "Unauthorized",
-      status: 401,
+      message: result.data.message || "Unable to process payment",
+      status: result.status,
     };
   }
 
-  try {
-    const response = await fetch(`${API_BASE_URL}/payments`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(paymentData),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      return {
-        success: false,
-        message: data.message || "Unable to process payment",
-        status: response.status,
-      };
-    }
-
-    return {
-      success: true,
-      transaction: data.transaction,
-    };
-  } catch {
-    return {
-      success: false,
-      message: "Unable to connect to the server",
-      status: 0,
-    };
-  }
+  return {
+    success: true,
+    transaction: result.data.transaction,
+  };
 }

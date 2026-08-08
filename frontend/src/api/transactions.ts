@@ -1,6 +1,15 @@
-import { clearSession } from "../helpers/authSession";
-import { API_BASE_URL } from "../constants";
-import type { Transaction } from "./payments";
+import { apiRequest } from "./apiClient";
+
+export type Transaction = {
+  id: number;
+  amount_cents: number;
+  currency: string;
+  description: string;
+  card_last_four: string;
+  status: string;
+  provider_transaction_id: string | null;
+  created_at: string;
+};
 
 type TransactionResult =
   | {
@@ -16,15 +25,6 @@ export async function getTransactions(
   fromDate = "",
   toDate = "",
 ): Promise<TransactionResult> {
-  const token = localStorage.getItem("merchant_token");
-
-  if (!token) {
-    return {
-      success: false,
-      message: "Unauthorized",
-    };
-  }
-
   const params = new URLSearchParams();
 
   if (fromDate) {
@@ -36,42 +36,21 @@ export async function getTransactions(
   }
 
   const query = params.toString();
-  const url = `${API_BASE_URL}/transactions${query ? `?${query}` : ""}`;
+  const path = `/transactions${query ? `?${query}` : ""}`;
 
-  try {
-    const response = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+  const result = await apiRequest(path, {
+    authenticated: true,
+  });
 
-    const data = await response.json();
-
-    if (response.status === 401) {
-      clearSession();
-      window.location.href = "/login";
-
-      return {
-        success: false,
-        message: "Unauthorized",
-      };
-    }
-
-    if (!response.ok) {
-      return {
-        success: false,
-        message: data.message || "Unable to load transactions",
-      };
-    }
-
-    return {
-      success: true,
-      transactions: data.transactions,
-    };
-  } catch {
+  if (!result.ok) {
     return {
       success: false,
-      message: "Unable to connect to the server",
+      message: result.data.message || "Unable to load transactions",
     };
   }
+
+  return {
+    success: true,
+    transactions: result.data.transactions,
+  };
 }

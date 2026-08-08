@@ -1,4 +1,4 @@
-import { API_BASE_URL } from "../constants";
+import { apiRequest } from "./apiClient";
 
 type LoginCredentials = {
   email: string;
@@ -18,44 +18,32 @@ type LoginSuccess = {
   merchant: Merchant;
 };
 
-export type ResponseFailure = {
+type ResponseFailure = {
   success: false;
   message: string;
 };
 
-export type LoginResult = LoginSuccess | ResponseFailure;
+type LoginResult = LoginSuccess | ResponseFailure;
 
 export async function loginMerchant(
   credentials: LoginCredentials,
 ): Promise<LoginResult> {
-  try {
-    const response = await fetch(`${API_BASE_URL}/auth/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(credentials),
-    });
+  const result = await apiRequest("/auth/login", {
+    method: "POST",
+    body: JSON.stringify(credentials),
+  });
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      return {
-        success: false,
-        message: data.message || "Unable to sign in",
-      };
-    }
-
-    return {
-      success: true,
-      token: data.token,
-      expires_at: data.expires_at,
-      merchant: data.merchant,
-    };
-  } catch {
+  if (!result.ok) {
     return {
       success: false,
-      message: "Unable to connect to the server",
+      message: result.data.message || "Unable to sign in",
     };
   }
+
+  return {
+    success: true,
+    token: result.data.token,
+    expires_at: result.data.expires_at,
+    merchant: result.data.merchant,
+  };
 }

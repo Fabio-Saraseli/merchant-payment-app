@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginMerchant } from "../api/auth";
+import { saveSession } from "../helpers/authSession";
 
 export const useLogin = () => {
   const [email, setEmail] = useState("");
@@ -33,9 +34,8 @@ export const useLogin = () => {
       return;
     }
 
-    localStorage.setItem("merchant_token", result.token);
-    localStorage.setItem("merchant", JSON.stringify(result.merchant));
-    localStorage.setItem("token_expires_at", result.expires_at);
+    saveSession(result.token, result.expires_at, result.merchant);
+
     navigate("/payments");
   };
 
