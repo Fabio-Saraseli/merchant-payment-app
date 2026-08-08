@@ -15,6 +15,7 @@ use App\Payments\PaymentProviderResolver;
 use App\Repositories\PdoTransactionRepository;
 use App\Services\PaymentService;
 use App\Controllers\TransactionController;
+use App\Payments\CardValidator;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
@@ -35,6 +36,7 @@ $connection = (new Database())->connect();
 $merchantRepository = new PdoMerchantRepository($connection);
 $apiTokenRepository = new PdoApiTokenRepository($connection);
 $transactionRepository = new PdoTransactionRepository($connection);
+$cardValidator = new CardValidator();
 
 $authService = new AuthService(
     $merchantRepository,
@@ -57,7 +59,8 @@ $authController = new AuthController($authService, $view);
 $paymentController = new PaymentController(
     $paymentService,
     $bearerAuthenticator,
-    $view
+    $view,
+    $cardValidator
 );
 
 $transactionController = new TransactionController(

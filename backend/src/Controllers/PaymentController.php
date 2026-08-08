@@ -7,15 +7,18 @@ class PaymentController
     private $paymentService;
     private $bearerAuthenticator;
     private $view;
+    private $cardValidator;
 
     public function __construct(
         $paymentService,
         $bearerAuthenticator,
-        $view
+        $view,
+        $cardValidator
     ) {
         $this->paymentService = $paymentService;
         $this->bearerAuthenticator = $bearerAuthenticator;
         $this->view = $view;
+        $this->cardValidator = $cardValidator;
     }
 
     public function charge()
@@ -28,7 +31,10 @@ class PaymentController
             ], 401);
         }
 
-        $data = json_decode(file_get_contents('php://input'), true);
+        $data = json_decode(
+            file_get_contents('php://input'),
+            true
+        );
 
         if (!is_array($data)) {
             return $this->view->render([
@@ -36,9 +42,9 @@ class PaymentController
             ], 400);
         }
 
-        $cardNumber = preg_replace('/\D/', '', $data['card_number'] ?? '');
+        $cardNumber = trim($data['card_number'] ?? '');
         $expiry = trim($data['expiry'] ?? '');
-        $cvv = preg_replace('/\D/', '', $data['cvv'] ?? '');
+        $cvv = trim($data['cvv'] ?? '');
         $description = trim($data['description'] ?? '');
         $amount = $data['amount'] ?? null;
 
@@ -54,19 +60,19 @@ class PaymentController
             ], 422);
         }
 
-        if (strlen($cardNumber) !== 16) {
+        if (!$this->cardValidator->isValidCardNumber($cardNumber)) {
             return $this->view->render([
-                'message' => 'Card number must contain 16 digits',
+                'message' => 'Invalid card number',
             ], 422);
         }
 
-        if (!preg_match('/^(0[1-9]|1[0-2])\/\d{2}$/', $expiry)) {
+        if (!$this->cardValidator->isValidExpiry($expiry)) {
             return $this->view->render([
-                'message' => 'Expiry date must use MM/YY format',
+                'message' => 'Invalid or expired card',
             ], 422);
         }
 
-        if (strlen($cvv) < 3 || strlen($cvv) > 4) {
+        if (!$this->cardValidator->isValidCvv($cvv)) {
             return $this->view->render([
                 'message' => 'CVV must contain 3 or 4 digits',
             ], 422);
@@ -78,7 +84,7 @@ class PaymentController
             ], 422);
         }
 
-        $amountCents = (int) round(((float) $amount) * 100);
+        $amountCents = round($amount * 100);
 
         $result = $this->paymentService->charge(
             $merchant,
