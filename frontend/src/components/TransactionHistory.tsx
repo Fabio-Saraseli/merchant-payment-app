@@ -1,4 +1,9 @@
 import { useTransactions } from "../hooks/useTransactions";
+import Alert from "./ui/Alert";
+import Button from "./ui/Button";
+import FormField from "./ui/FormField";
+import Input from "./ui/Input";
+import SectionHeader from "./ui/SectionHeader";
 
 function TransactionHistory() {
   const {
@@ -14,76 +19,56 @@ function TransactionHistory() {
   } = useTransactions();
 
   return (
-    <section className="rounded-xl border mt-5 border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-      <div className="text-left">
-        <h2 className="text-lg font-semibold text-slate-900 sm:text-xl">
-          Transaction History
-        </h2>
-
-        <p className="mt-1 text-sm text-slate-500">
-          Review and filter previous payment transactions.
-        </p>
-      </div>
+    <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+      <SectionHeader
+        title="Transaction History"
+        description="Review and filter previous payment transactions."
+      />
 
       <form
         onSubmit={handleFilter}
         className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_auto_auto]"
       >
-        <div className="text-left">
-          <label
-            htmlFor="fromDate"
-            className="mb-2 block text-sm font-medium text-slate-700"
-          >
-            From
-          </label>
-
-          <input
+        <FormField label="From" htmlFor="fromDate">
+          <Input
             id="fromDate"
             type="date"
             value={fromDate}
             onChange={(event) => setFromDate(event.target.value)}
-            className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-slate-500"
           />
-        </div>
+        </FormField>
 
-        <div className="text-left">
-          <label
-            htmlFor="toDate"
-            className="mb-2 block text-sm font-medium text-slate-700"
-          >
-            To
-          </label>
-
-          <input
+        <FormField label="To" htmlFor="toDate">
+          <Input
             id="toDate"
             type="date"
             value={toDate}
             onChange={(event) => setToDate(event.target.value)}
-            className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-slate-500"
           />
-        </div>
+        </FormField>
 
-        <button
+        <Button
           type="submit"
           disabled={isLoading}
-          className="w-full rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800 disabled:opacity-60 lg:self-end"
+          className="w-full lg:self-end"
         >
           Filter
-        </button>
+        </Button>
 
-        <button
+        <Button
           type="button"
+          variant="secondary"
           onClick={handleClearFilters}
           disabled={isLoading}
-          className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-60 lg:self-end"
+          className="w-full lg:self-end"
         >
           Clear
-        </button>
+        </Button>
       </form>
 
       {errorMessage && (
-        <div className="mt-5 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-left text-sm text-red-700">
-          {errorMessage}
+        <div className="mt-5">
+          <Alert type="error" message={errorMessage} />
         </div>
       )}
 
