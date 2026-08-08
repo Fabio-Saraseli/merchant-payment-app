@@ -14,6 +14,7 @@ use App\Payments\FakeStripeProvider;
 use App\Payments\PaymentProviderResolver;
 use App\Repositories\PdoTransactionRepository;
 use App\Services\PaymentService;
+use App\Controllers\TransactionController;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
@@ -59,6 +60,12 @@ $paymentController = new PaymentController(
     $view
 );
 
+$transactionController = new TransactionController(
+    $transactionRepository,
+    $bearerAuthenticator,
+    $view
+);
+
 $router->get('/', [$healthController, 'index']);
 
 $router->post('/api/auth/login', [
@@ -69,6 +76,11 @@ $router->post('/api/auth/login', [
 $router->post('/api/payments', [
     $paymentController,
     'charge'
+]);
+
+$router->get('/api/transactions', [
+    $transactionController,
+    'index'
 ]);
 
 $router->dispatch(
