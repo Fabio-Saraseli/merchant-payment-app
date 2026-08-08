@@ -1,4 +1,7 @@
 import { useLogin } from "../hooks/useLogin";
+import Alert from "../components/ui/Alert";
+import FormField from "../components/ui/FormField";
+import Input from "../components/ui/Input";
 
 function LoginPage() {
   const {
@@ -25,49 +28,29 @@ function LoginPage() {
         </div>
 
         <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
-          <div className="text-left">
-            <label
-              htmlFor="email"
-              className="mb-2 block text-sm font-medium text-slate-700"
-            >
-              Email
-            </label>
-
-            <input
+          <FormField label="Email" htmlFor="email">
+            <Input
               id="email"
               type="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               autoComplete="email"
               placeholder="merchant@example.com"
-              className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-500"
             />
-          </div>
+          </FormField>
 
-          <div className="text-left">
-            <label
-              htmlFor="password"
-              className="mb-2 block text-sm font-medium text-slate-700"
-            >
-              Password
-            </label>
-
-            <input
+          <FormField label="Password" htmlFor="password">
+            <Input
               id="password"
               type="password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               autoComplete="current-password"
               placeholder="Enter your password"
-              className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-500"
             />
-          </div>
+          </FormField>
 
-          {errorMessage && (
-            <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-left text-sm text-red-700">
-              {errorMessage}
-            </div>
-          )}
+          {errorMessage && <Alert type="error" message={errorMessage} />}
 
           <button
             type="submit"

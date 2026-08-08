@@ -1,16 +1,19 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { clearSession } from "../helpers/authSession";
+import { clearSession, getMerchant } from "../helpers/authSession";
 
 function MerchantLayout() {
   const navigate = useNavigate();
-
-  const storedMerchant = localStorage.getItem("merchant");
-  const merchant = storedMerchant ? JSON.parse(storedMerchant) : null;
+  const merchant = getMerchant();
 
   const handleLogout = () => {
     clearSession();
     navigate("/login");
   };
+
+  const navLinkClass = ({ isActive }: { isActive: boolean }) =>
+    `whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium transition ${
+      isActive ? "bg-slate-900 text-white" : "text-slate-600 hover:bg-slate-100"
+    }`;
 
   return (
     <main className="min-h-screen bg-slate-50">
@@ -41,29 +44,11 @@ function MerchantLayout() {
           </div>
 
           <nav className="mt-5 flex gap-2 overflow-x-auto">
-            <NavLink
-              to="/payments"
-              className={({ isActive }) =>
-                `whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium transition ${
-                  isActive
-                    ? "bg-slate-900 text-white"
-                    : "text-slate-600 hover:bg-slate-100"
-                }`
-              }
-            >
+            <NavLink to="/payments" className={navLinkClass}>
               Payments
             </NavLink>
 
-            <NavLink
-              to="/transactions"
-              className={({ isActive }) =>
-                `whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium transition ${
-                  isActive
-                    ? "bg-slate-900 text-white"
-                    : "text-slate-600 hover:bg-slate-100"
-                }`
-              }
-            >
+            <NavLink to="/transactions" className={navLinkClass}>
               Transactions
             </NavLink>
           </nav>

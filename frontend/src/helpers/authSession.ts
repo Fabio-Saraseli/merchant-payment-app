@@ -13,3 +13,23 @@ export function isSessionExpired() {
 
   return new Date(expiresAt).getTime() <= Date.now();
 }
+
+export type MerchantSession = {
+  id: number;
+  name: string;
+  email: string;
+};
+
+export function getMerchant() {
+  const storedMerchant = localStorage.getItem("merchant");
+
+  if (!storedMerchant) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(storedMerchant) as MerchantSession;
+  } catch {
+    return null;
+  }
+}
