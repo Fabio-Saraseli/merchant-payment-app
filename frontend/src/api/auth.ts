@@ -1,9 +1,11 @@
+import { API_BASE_URL } from "../constants";
+
 type LoginCredentials = {
   email: string;
   password: string;
 };
 
-type Merchant = {
+export type Merchant = {
   id: number;
   name: string;
   email: string;
@@ -16,18 +18,18 @@ type LoginSuccess = {
   merchant: Merchant;
 };
 
-type LoginFailure = {
+export type ResponseFailure = {
   success: false;
   message: string;
 };
 
-export type LoginResult = LoginSuccess | LoginFailure;
+export type LoginResult = LoginSuccess | ResponseFailure;
 
 export async function loginMerchant(
   credentials: LoginCredentials,
 ): Promise<LoginResult> {
   try {
-    const response = await fetch("http://localhost:8080/api/auth/login", {
+    const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

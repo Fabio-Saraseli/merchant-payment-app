@@ -1,3 +1,5 @@
+import { API_BASE_URL } from "../constants";
+
 type PaymentData = {
   card_number: string;
   expiry: string;
@@ -6,7 +8,7 @@ type PaymentData = {
   description: string;
 };
 
-type Transaction = {
+export type Transaction = {
   id: number;
   amount_cents: number;
   currency: string;
@@ -16,19 +18,6 @@ type Transaction = {
   provider_transaction_id: string | null;
   created_at: string;
 };
-
-type PaymentSuccess = {
-  success: true;
-  transaction: Transaction;
-};
-
-type PaymentFailure = {
-  success: false;
-  message: string;
-  status: number;
-};
-
-export type PaymentResult = PaymentSuccess | PaymentFailure;
 
 export async function createPayment(paymentData: PaymentData) {
   const token = localStorage.getItem("merchant_token");
@@ -42,7 +31,7 @@ export async function createPayment(paymentData: PaymentData) {
   }
 
   try {
-    const response = await fetch("http://localhost:8080/api/payments", {
+    const response = await fetch(`${API_BASE_URL}/payments`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
