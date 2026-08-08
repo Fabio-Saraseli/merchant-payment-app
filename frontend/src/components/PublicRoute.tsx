@@ -9,7 +9,7 @@ function PublicRoute({ children }: PublicRouteProps) {
   const token = localStorage.getItem("merchant_token");
 
   if (token && !isSessionExpired()) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/payments" replace />;
   }
 
   if (token && isSessionExpired()) {
