@@ -15,19 +15,28 @@ class Database
             return $this->connection;
         }
 
-        $host = $this->getEnvironmentVariable('DB_HOST');
-        $port = $this->getEnvironmentVariable('DB_PORT');
-        $database = $this->getEnvironmentVariable('DB_NAME');
-        $username = $this->getEnvironmentVariable('DB_USER');
-        $password = $this->getEnvironmentVariable('DB_PASSWORD');
+        $dsn = $this->getEnvironmentVariable('DB_DSN');
 
-        $dsn = "pgsql:host={$host};port={$port};dbname={$database}";
+        $username = getenv('DB_USER');
+        $password = getenv('DB_PASSWORD');
 
-        $this->connection = new PDO($dsn, $username, $password, [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES => false,
-        ]);
+        if ($username === false) {
+            $username = null;
+        }
+
+        if ($password === false) {
+            $password = null;
+        }
+
+        $this->connection = new PDO(
+            $dsn,
+            $username,
+            $password,
+            [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            ]
+        );
 
         return $this->connection;
     }
@@ -37,7 +46,9 @@ class Database
         $value = getenv($name);
 
         if ($value === false || $value === '') {
-            throw new RuntimeException("Missing environment variable: {$name}");
+            throw new RuntimeException(
+                "Missing environment variable: {$name}"
+            );
         }
 
         return $value;

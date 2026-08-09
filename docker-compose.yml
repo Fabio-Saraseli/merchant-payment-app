@@ -4,39 +4,9 @@ services:
       context: ./backend
     ports:
       - "8080:8080"
-    environment:
-      DB_HOST: database
-      DB_PORT: 5432
-      DB_NAME: merchant_payments
-      DB_USER: merchant_app
-      DB_PASSWORD: merchant_password
-    depends_on:
-      database:
-        condition: service_healthy
 
   frontend:
     build:
       context: ./frontend
     ports:
       - "5173:5173"
-
-  database:
-    image: postgres:17-alpine
-    environment:
-      POSTGRES_DB: merchant_payments
-      POSTGRES_USER: merchant_app
-      POSTGRES_PASSWORD: merchant_password
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"
-        ]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-volumes:
-  postgres_data:

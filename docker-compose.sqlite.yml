@@ -1,0 +1,9 @@
+services:
+  backend:
+    environment:
+      DB_DSN: "sqlite:/app/storage/merchant_payments.sqlite"
+    volumes:
+      - sqlite_data:/app/storage
+
+volumes:
+  sqlite_data:

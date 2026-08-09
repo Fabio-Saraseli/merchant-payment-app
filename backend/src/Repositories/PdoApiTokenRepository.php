@@ -15,26 +15,28 @@ class PdoApiTokenRepository implements ApiTokenRepositoryInterface
 
     public function create($apiToken)
     {
+        $tokenId = bin2hex(random_bytes(16));
+
         $statement = $this->connection->prepare(
             'INSERT INTO api_tokens (
+                id,
                 merchant_id,
                 token_hash,
                 expires_at
             ) VALUES (
+                :id,
                 :merchant_id,
                 :token_hash,
                 :expires_at
-            )
-            RETURNING id'
+            )'
         );
 
         $statement->execute([
+            'id' => $tokenId,
             'merchant_id' => $apiToken->getMerchantId(),
             'token_hash' => $apiToken->getTokenHash(),
             'expires_at' => $apiToken->getExpiresAt(),
         ]);
-
-        $tokenId = $statement->fetchColumn();
 
         return new ApiToken(
             $tokenId,
@@ -53,8 +55,7 @@ class PdoApiTokenRepository implements ApiTokenRepositoryInterface
                 token_hash,
                 expires_at
              FROM api_tokens
-             WHERE token_hash = :token_hash
-             LIMIT 1'
+             WHERE token_hash = :token_hash'
         );
 
         $statement->execute([

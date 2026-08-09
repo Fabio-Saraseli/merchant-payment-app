@@ -1,6 +1,6 @@
 CREATE TABLE transactions (
-    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    merchant_id INTEGER NOT NULL,
+    id VARCHAR(32) PRIMARY KEY,
+    merchant_id VARCHAR(32) NOT NULL,
     payment_provider VARCHAR(50) NOT NULL,
     provider_transaction_id VARCHAR(255),
     amount_cents INTEGER NOT NULL,

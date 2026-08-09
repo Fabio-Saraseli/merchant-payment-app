@@ -1,7 +1,11 @@
-set -e
+#!/bin/sh
 
-echo "Running database migrations..."
-php bin/migrate.php
+echo "Waiting for storage to become available..."
+
+until php bin/migrate.php; do
+    echo "Storage is not ready yet. Retrying in 2 seconds..."
+    sleep 2
+done
 
 echo "Seeding database..."
 php bin/seed.php

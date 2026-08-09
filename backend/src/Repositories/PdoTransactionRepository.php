@@ -15,8 +15,12 @@ class PdoTransactionRepository implements TransactionRepositoryInterface
 
     public function create($transaction)
     {
+        $transactionId = bin2hex(random_bytes(16));
+        $createdAt = gmdate('Y-m-d H:i:s');
+
         $statement = $this->connection->prepare(
             'INSERT INTO transactions (
+                id,
                 merchant_id,
                 payment_provider,
                 provider_transaction_id,
@@ -24,8 +28,10 @@ class PdoTransactionRepository implements TransactionRepositoryInterface
                 currency,
                 description,
                 card_last_four,
-                status
+                status,
+                created_at
             ) VALUES (
+                :id,
                 :merchant_id,
                 :payment_provider,
                 :provider_transaction_id,
@@ -33,12 +39,13 @@ class PdoTransactionRepository implements TransactionRepositoryInterface
                 :currency,
                 :description,
                 :card_last_four,
-                :status
-            )
-            RETURNING id, created_at'
+                :status,
+                :created_at
+            )'
         );
 
         $statement->execute([
+            'id' => $transactionId,
             'merchant_id' => $transaction->getMerchantId(),
             'payment_provider' => $transaction->getPaymentProvider(),
             'provider_transaction_id' => $transaction->getProviderTransactionId(),
@@ -47,12 +54,11 @@ class PdoTransactionRepository implements TransactionRepositoryInterface
             'description' => $transaction->getDescription(),
             'card_last_four' => $transaction->getCardLastFour(),
             'status' => $transaction->getStatus(),
+            'created_at' => $createdAt,
         ]);
 
-        $transactionData = $statement->fetch();
-
         return new Transaction(
-            $transactionData['id'],
+            $transactionId,
             $transaction->getMerchantId(),
             $transaction->getPaymentProvider(),
             $transaction->getProviderTransactionId(),
@@ -61,7 +67,7 @@ class PdoTransactionRepository implements TransactionRepositoryInterface
             $transaction->getDescription(),
             $transaction->getCardLastFour(),
             $transaction->getStatus(),
-            $transactionData['created_at']
+            $createdAt
         );
     }
 
@@ -71,20 +77,20 @@ class PdoTransactionRepository implements TransactionRepositoryInterface
         $toDate = null
     ) {
         $query = '
-        SELECT
-            id,
-            merchant_id,
-            payment_provider,
-            provider_transaction_id,
-            amount_cents,
-            currency,
-            description,
-            card_last_four,
-            status,
-            created_at
-        FROM transactions
-        WHERE merchant_id = :merchant_id
-    ';
+            SELECT
+                id,
+                merchant_id,
+                payment_provider,
+                provider_transaction_id,
+                amount_cents,
+                currency,
+                description,
+                card_last_four,
+                status,
+                created_at
+            FROM transactions
+            WHERE merchant_id = :merchant_id
+        ';
 
         $parameters = [
             'merchant_id' => $merchantId,

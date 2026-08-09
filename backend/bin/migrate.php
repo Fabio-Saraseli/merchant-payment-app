@@ -9,8 +9,7 @@ $connection = $database->connect();
 
 $connection->exec(
     'CREATE TABLE IF NOT EXISTS migrations (
-        id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-        migration VARCHAR(255) UNIQUE NOT NULL,
+        migration VARCHAR(255) PRIMARY KEY,
         executed_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
     )'
 );
@@ -26,7 +25,7 @@ if (!$migrationFiles) {
 sort($migrationFiles);
 
 $statement = $connection->query(
-    'SELECT migration FROM migrations ORDER BY id'
+    'SELECT migration FROM migrations ORDER BY migration'
 );
 
 $executedMigrations = $statement->fetchAll(PDO::FETCH_COLUMN);
@@ -46,8 +45,6 @@ foreach ($migrationFiles as $migrationFile) {
         );
     }
 
-    $connection->beginTransaction();
-
     try {
         $connection->exec($sql);
 
@@ -60,13 +57,13 @@ foreach ($migrationFiles as $migrationFile) {
             'migration' => $migrationName,
         ]);
 
-        $connection->commit();
-
         echo "Executed migration: {$migrationName}" . PHP_EOL;
     } catch (Throwable $exception) {
-        $connection->rollBack();
-
-        throw $exception;
+        throw new RuntimeException(
+            "Migration failed: {$migrationName}. " . $exception->getMessage(),
+            0,
+            $exception
+        );
     }
 }
 
