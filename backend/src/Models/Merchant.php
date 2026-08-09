@@ -9,19 +9,22 @@ class Merchant
     private $email;
     private $passwordHash;
     private $paymentProvider;
+    private $paymentProviderConfig;
 
     public function __construct(
         $id,
         $name,
         $email,
         $passwordHash,
-        $paymentProvider
+        $paymentProvider,
+        $paymentProviderConfig = []
     ) {
         $this->id = $id;
         $this->name = $name;
         $this->email = $email;
         $this->passwordHash = $passwordHash;
         $this->paymentProvider = $paymentProvider;
+        $this->paymentProviderConfig = $paymentProviderConfig;
     }
 
     public function getId()
@@ -47,5 +50,9 @@ class Merchant
     public function getPaymentProvider()
     {
         return $this->paymentProvider;
+    }
+    public function getPaymentProviderConfig()
+    {
+        return $this->paymentProviderConfig;
     }
 }

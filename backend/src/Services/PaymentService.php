@@ -40,6 +40,7 @@ class PaymentService
         $cardNumber = preg_replace('/\D/', '', $cardNumber);
 
         $providerResult = $provider->charge(
+            $merchant->getPaymentProviderConfig(),
             $cardNumber,
             $expiry,
             $cvv,

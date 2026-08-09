@@ -5,6 +5,7 @@ namespace App\Payments;
 interface PaymentProviderInterface
 {
     public function charge(
+        $config,
         $cardNumber,
         $expiry,
         $cvv,

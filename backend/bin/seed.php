@@ -9,29 +9,58 @@ require dirname(__DIR__) . '/vendor/autoload.php';
 $connection = (new Database())->connect();
 $merchantRepository = new PdoMerchantRepository($connection);
 
-$email = 'demo@merchant.test';
+$merchants = [
+    [
+        'name' => 'Demo Merchant',
+        'email' => 'demo@merchant.test',
+        'password' => 'password123',
+        'payment_provider' => 'fake_stripe',
+        'payment_provider_config' => [
+            'account_id' => 'fake_account_demo',
+        ],
+    ],
+    [
+        'name' => 'Second Merchant',
+        'email' => 'second@merchant.test',
+        'password' => 'password123',
+        'payment_provider' => 'fake_stripe',
+        'payment_provider_config' => [
+            'account_id' => 'fake_account_second',
+        ],
+    ],
+];
 
-$existingMerchant = $merchantRepository->findByEmail($email);
+foreach ($merchants as $merchantData) {
+    $existingMerchant = $merchantRepository->findByEmail(
+        $merchantData['email']
+    );
 
-if ($existingMerchant) {
-    echo "Demo merchant already exists." . PHP_EOL;
-    exit;
+    if ($existingMerchant) {
+        echo $merchantData['name'] . " already exists." . PHP_EOL;
+        continue;
+    }
+
+    $passwordHash = password_hash(
+        $merchantData['password'],
+        PASSWORD_DEFAULT
+    );
+
+    if (!$passwordHash) {
+        throw new RuntimeException(
+            'Could not hash the merchant password.'
+        );
+    }
+
+    $merchant = new Merchant(
+        null,
+        $merchantData['name'],
+        $merchantData['email'],
+        $passwordHash,
+        $merchantData['payment_provider'],
+        $merchantData['payment_provider_config']
+    );
+
+    $merchantRepository->create($merchant);
+
+    echo $merchantData['name'] . " created." . PHP_EOL;
 }
-
-$passwordHash = password_hash('password123', PASSWORD_DEFAULT);
-
-if (!$passwordHash) {
-    throw new RuntimeException('Could not hash the merchant password.');
-}
-
-$merchant = new Merchant(
-    null,
-    'Demo Merchant',
-    $email,
-    $passwordHash,
-    'fake_stripe'
-);
-
-$merchantRepository->create($merchant);
-
-echo "Demo merchant created." . PHP_EOL;

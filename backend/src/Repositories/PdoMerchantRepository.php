@@ -21,7 +21,8 @@ class PdoMerchantRepository implements MerchantRepositoryInterface
                 name,
                 email,
                 password_hash,
-                payment_provider
+                payment_provider,
+                payment_provider_config
              FROM merchants
              WHERE email = :email
              LIMIT 1'
@@ -42,24 +43,27 @@ class PdoMerchantRepository implements MerchantRepositoryInterface
             $merchantData['name'],
             $merchantData['email'],
             $merchantData['password_hash'],
-            $merchantData['payment_provider']
+            $merchantData['payment_provider'],
+            json_decode($merchantData['payment_provider_config'], true)
         );
     }
     public function create($merchant)
     {
         $statement = $this->connection->prepare(
             'INSERT INTO merchants (
-            name,
-            email,
-            password_hash,
-            payment_provider
-        ) VALUES (
-            :name,
-            :email,
-            :password_hash,
-            :payment_provider
-        )
-        RETURNING id'
+                name,
+                email,
+                password_hash,
+                payment_provider,
+                payment_provider_config
+            ) VALUES (
+                :name,
+                :email,
+                :password_hash,
+                :payment_provider,
+                :payment_provider_config
+            )
+            RETURNING id'
         );
 
         $statement->execute([
@@ -67,6 +71,9 @@ class PdoMerchantRepository implements MerchantRepositoryInterface
             'email' => $merchant->getEmail(),
             'password_hash' => $merchant->getPasswordHash(),
             'payment_provider' => $merchant->getPaymentProvider(),
+            'payment_provider_config' => json_encode(
+                $merchant->getPaymentProviderConfig()
+            ),
         ]);
 
         $merchantId = $statement->fetchColumn();
@@ -76,7 +83,8 @@ class PdoMerchantRepository implements MerchantRepositoryInterface
             $merchant->getName(),
             $merchant->getEmail(),
             $merchant->getPasswordHash(),
-            $merchant->getPaymentProvider()
+            $merchant->getPaymentProvider(),
+            $merchant->getPaymentProviderConfig()
         );
     }
 
@@ -84,14 +92,15 @@ class PdoMerchantRepository implements MerchantRepositoryInterface
     {
         $statement = $this->connection->prepare(
             'SELECT
-            id,
-            name,
-            email,
-            password_hash,
-            payment_provider
-         FROM merchants
-         WHERE id = :id
-         LIMIT 1'
+                id,
+                name,
+                email,
+                password_hash,
+                payment_provider,
+                payment_provider_config
+             FROM merchants
+             WHERE id = :id
+             LIMIT 1'
         );
 
         $statement->execute([
@@ -109,7 +118,8 @@ class PdoMerchantRepository implements MerchantRepositoryInterface
             $merchantData['name'],
             $merchantData['email'],
             $merchantData['password_hash'],
-            $merchantData['payment_provider']
+            $merchantData['payment_provider'],
+            json_decode($merchantData['payment_provider_config'], true)
         );
     }
 }
