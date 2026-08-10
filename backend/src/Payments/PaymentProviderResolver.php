@@ -4,13 +4,15 @@ namespace App\Payments;
 
 class PaymentProviderResolver
 {
-    private $providers;
+    private $providers = [];
     public function __construct($providers)
     {
-        $this->providers = $providers;
+        foreach ($providers as $provider) {
+            $this->providers[$provider->getName()] = $provider;
+        }
     }
-    public function resolve($providerName)
+    public function resolve($name)
     {
-        return $this->providers[$providerName] ?? null;
+        return $this->providers[$name] ?? null;
     }
 }

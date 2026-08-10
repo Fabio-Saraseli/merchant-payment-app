@@ -4,6 +4,11 @@ namespace App\Payments;
 
 class FakeStripeProvider implements PaymentProviderInterface
 {
+    public function getName()
+    {
+        return 'fake_stripe';
+    }
+
     public function charge(
         $config,
         $cardNumber,
@@ -35,7 +40,7 @@ class FakeStripeProvider implements PaymentProviderInterface
             'provider_transaction_id' =>
             $config['account_id'] . '_' . bin2hex(random_bytes(8)),
             'status' => 'succeeded',
-            'message' => null,
+            'message' => 'Payment successful',
         ];
     }
 }

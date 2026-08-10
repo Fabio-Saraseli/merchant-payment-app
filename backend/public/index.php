@@ -10,7 +10,6 @@ use App\Repositories\PdoMerchantRepository;
 use App\Services\AuthService;
 use App\Auth\BearerAuthenticator;
 use App\Controllers\PaymentController;
-use App\Payments\FakeStripeProvider;
 use App\Payments\PaymentProviderResolver;
 use App\Repositories\PdoTransactionRepository;
 use App\Services\PaymentService;
@@ -47,9 +46,12 @@ $authService = new AuthService(
 
 $bearerAuthenticator = new BearerAuthenticator($authService);
 
-$paymentProviderResolver = new PaymentProviderResolver([
-    'fake_stripe' => new FakeStripeProvider(),
-]);
+$providers = require dirname(__DIR__)
+    . '/config/payment_providers.php';
+
+$paymentProviderResolver = new PaymentProviderResolver(
+    $providers
+);
 
 $emailSender = new SmtpEmailSender(
     getenv('SMTP_HOST'),
