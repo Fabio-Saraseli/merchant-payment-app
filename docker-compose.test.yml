@@ -84,7 +84,7 @@ services:
                           getenv("TEST_DB_PASSWORD")
                       );
                       exit(0);
-                  } catch (Throwable $e) {
+                  } catch (Throwable $$e) {
                       exit(1);
                   }
               '

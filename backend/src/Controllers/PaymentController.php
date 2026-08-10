@@ -85,7 +85,7 @@ class PaymentController
             ], 422);
         }
 
-        $amountCents = round($amount * 100);
+        $amountCents = (int) round($amount * 100);
 
         $result = $this->paymentService->charge(
             $merchant,
