@@ -1,0 +1,104 @@
+services:
+  postgres-test:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: merchant_payments_test
+      POSTGRES_USER: merchant_test
+      POSTGRES_PASSWORD: merchant_test_password
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"
+        ]
+      interval: 2s
+      timeout: 5s
+      retries: 15
+
+  mysql-test:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: merchant_payments_test
+      MYSQL_USER: merchant_test
+      MYSQL_PASSWORD: merchant_test_password
+      MYSQL_ROOT_PASSWORD: root_test_password
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "mysqladmin ping -h 127.0.0.1 -u$$MYSQL_USER -p$$MYSQL_PASSWORD --silent"
+        ]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+      start_period: 10s
+
+  backend-tests:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.test
+
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+
+      mysql-test:
+        condition: service_healthy
+
+    command:
+      - /bin/sh
+      - -c
+      - |
+        set -e
+
+        echo "================================="
+        echo "Running tests with SQLite"
+        echo "================================="
+
+        TEST_DB_DSN="sqlite::memory:" \
+        ./vendor/bin/phpunit
+
+        echo ""
+        echo "================================="
+        echo "Running tests with PostgreSQL"
+        echo "================================="
+
+        TEST_DB_DSN="pgsql:host=postgres-test;port=5432;dbname=merchant_payments_test" \
+        TEST_DB_USER="merchant_test" \
+        TEST_DB_PASSWORD="merchant_test_password" \
+        ./vendor/bin/phpunit
+
+        echo ""
+        echo "================================="
+        echo "Waiting for MySQL"
+        echo "================================="
+
+        until TEST_DB_DSN="mysql:host=mysql-test;port=3306;dbname=merchant_payments_test;charset=utf8mb4" \
+              TEST_DB_USER="merchant_test" \
+              TEST_DB_PASSWORD="merchant_test_password" \
+              php -r '
+                  try {
+                      new PDO(
+                          getenv("TEST_DB_DSN"),
+                          getenv("TEST_DB_USER"),
+                          getenv("TEST_DB_PASSWORD")
+                      );
+                      exit(0);
+                  } catch (Throwable $e) {
+                      exit(1);
+                  }
+              '
+        do
+            echo "MySQL is not ready yet..."
+            sleep 2
+        done
+
+        echo ""
+        echo "================================="
+        echo "Running tests with MySQL"
+        echo "================================="
+
+        TEST_DB_DSN="mysql:host=mysql-test;port=3306;dbname=merchant_payments_test;charset=utf8mb4" \
+        TEST_DB_USER="merchant_test" \
+        TEST_DB_PASSWORD="merchant_test_password" \
+        ./vendor/bin/phpunit
