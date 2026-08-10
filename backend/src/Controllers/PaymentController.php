@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Controllers;
+use App\Http\Request;
 
 class PaymentController
 {
@@ -8,17 +9,20 @@ class PaymentController
     private $bearerAuthenticator;
     private $view;
     private $cardValidator;
+    private $request;
 
     public function __construct(
         $paymentService,
         $bearerAuthenticator,
         $view,
-        $cardValidator
+        $cardValidator,
+        $request = null
     ) {
         $this->paymentService = $paymentService;
         $this->bearerAuthenticator = $bearerAuthenticator;
         $this->view = $view;
         $this->cardValidator = $cardValidator;
+        $this->request = $request ?: new Request();
     }
 
     public function charge()
@@ -31,10 +35,7 @@ class PaymentController
             ], 401);
         }
 
-        $data = json_decode(
-            file_get_contents('php://input'),
-            true
-        );
+        $data = $this->request->json();
 
         if (!is_array($data)) {
             return $this->view->render([

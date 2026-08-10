@@ -1,26 +1,29 @@
 <?php
 
 namespace App\Controllers;
+use App\Http\Request;
 
 class AuthController
 {
     private $authService;
     private $view;
+    private $request;
 
-    public function __construct($authService, $view)
-    {
+    public function __construct(
+        $authService,
+        $view,
+        $request = null
+    ) {
         $this->authService = $authService;
         $this->view = $view;
+        $this->request = $request ?: new Request();
     }
 
     public function login()
     {
-        $data = json_decode(
-            file_get_contents('php://input'),
-            true
-        );
+        $data = $this->request->json();
 
-        if (!$data) {
+        if (!is_array($data)) {
             $this->view->render([
                 'message' => 'Invalid request body',
             ], 400);

@@ -1,21 +1,25 @@
 <?php
 
 namespace App\Controllers;
+use App\Http\Request;
 
 class TransactionController
 {
     private $transactionRepository;
     private $bearerAuthenticator;
     private $view;
+    private $request;
 
     public function __construct(
         $transactionRepository,
         $bearerAuthenticator,
-        $view
+        $view,
+        $request = null
     ) {
         $this->transactionRepository = $transactionRepository;
         $this->bearerAuthenticator = $bearerAuthenticator;
         $this->view = $view;
+        $this->request = $request ?: new Request();
     }
 
     public function index()
@@ -28,8 +32,8 @@ class TransactionController
             ], 401);
         }
 
-        $fromDate = $_GET['from'] ?? null;
-        $toDate = $_GET['to'] ?? null;
+        $fromDate = $this->request->query('from');
+        $toDate = $this->request->query('to');
 
         $transactions = $this->transactionRepository
             ->findByMerchantAndDateRange(
