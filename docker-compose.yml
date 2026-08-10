@@ -4,9 +4,19 @@ services:
       context: ./backend
     ports:
       - "8080:8080"
+    environment:
+      SMTP_HOST: mailpit
+      SMTP_PORT: 1025
+      MAIL_FROM: payments@merchant-app.test
+      MAIL_FROM_NAME: Merchant Payment App
 
   frontend:
     build:
       context: ./frontend
     ports:
       - "5173:5173"
+
+  mailpit:
+    image: axllent/mailpit
+    ports:
+      - "8025:8025"

@@ -8,13 +8,16 @@ class PaymentService
 {
     private $transactionRepository;
     private $paymentProviderResolver;
+    private $paymentNotificationService;
 
     public function __construct(
         $transactionRepository,
-        $paymentProviderResolver
+        $paymentProviderResolver,
+        $paymentNotificationService
     ) {
         $this->transactionRepository = $transactionRepository;
         $this->paymentProviderResolver = $paymentProviderResolver;
+        $this->paymentNotificationService = $paymentNotificationService;
     }
 
     public function charge(
@@ -60,7 +63,15 @@ class PaymentService
             $providerResult['status']
         );
 
-        $transaction = $this->transactionRepository->create($transaction);
+        $transaction = $this->transactionRepository->create(
+            $transaction
+        );
+
+        $this->paymentNotificationService->sendPaymentResult(
+            $merchant,
+            $transaction,
+            $providerResult['message']
+        );
 
         return [
             'success' => $providerResult['success'],

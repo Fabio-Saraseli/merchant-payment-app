@@ -16,6 +16,8 @@ use App\Repositories\PdoTransactionRepository;
 use App\Services\PaymentService;
 use App\Controllers\TransactionController;
 use App\Payments\CardValidator;
+use App\Notifications\SmtpEmailSender;
+use App\Services\PaymentNotificationService;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
@@ -49,13 +51,26 @@ $paymentProviderResolver = new PaymentProviderResolver([
     'fake_stripe' => new FakeStripeProvider(),
 ]);
 
+$emailSender = new SmtpEmailSender(
+    getenv('SMTP_HOST'),
+    getenv('SMTP_PORT'),
+    getenv('MAIL_FROM'),
+    getenv('MAIL_FROM_NAME')
+);
+
+$paymentNotificationService = new PaymentNotificationService(
+    $emailSender
+);
+
 $paymentService = new PaymentService(
     $transactionRepository,
-    $paymentProviderResolver
+    $paymentProviderResolver,
+    $paymentNotificationService
 );
 
 $healthController = new HealthController($view);
 $authController = new AuthController($authService, $view);
+
 $paymentController = new PaymentController(
     $paymentService,
     $bearerAuthenticator,

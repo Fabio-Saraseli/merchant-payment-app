@@ -3,7 +3,8 @@
     "description": "Vanilla PHP API for processing merchant card payments.",
     "type": "project",
     "require": {
-        "php": "^8.2"
+        "php": "^8.2",
+        "phpmailer/phpmailer": "^7.1"
     },
     "autoload": {
         "psr-4": {

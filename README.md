@@ -199,3 +199,48 @@ docker compose \
 ```
 
 Be careful with `-v` because it deletes the Docker volume and therefore the stored database data.
+
+## Email notifications
+
+The assignment mentions that the email delivery mechanism is left open, without specifying exactly how email should be used.
+
+For this implementation I added a notification after a payment has been processed.
+
+When a payment is successful it generates a success email.
+
+A declined payment generates a failed payment email.
+
+The notification is addressed to the email of the currently authenticated merchant.
+
+For development I use Mailpit as the SMTP server. Mailpit captures the outgoing emails locally, so no real emails are sent to external addresses.
+
+The email flow is:
+
+```text
+PaymentService
+    |
+PaymentNotificationService
+    |
+EmailSenderInterface
+    |
+SmtpEmailSender
+    |
+Mailpit
+```
+
+This also keeps the payment logic separate from the email delivery mechanism.
+
+### Viewing emails
+
+Mailpit starts together with the app and its inbox can be opened at:
+
+[http://localhost:8025](http://localhost:8025)
+
+After making a payment from the frontend, the generted email should appear in the Mailpit inbox.
+
+The email includes:
+
+- payment amount
+- description
+- transaction ID
+- failure reason when the payment is declined
