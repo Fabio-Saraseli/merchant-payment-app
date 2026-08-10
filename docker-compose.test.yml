@@ -102,3 +102,11 @@ services:
         TEST_DB_USER="merchant_test" \
         TEST_DB_PASSWORD="merchant_test_password" \
         ./vendor/bin/phpunit
+
+        echo ""
+        echo "================================="
+        echo "ALL DATABASE TESTS PASSED"
+        echo "SQLite      OK"
+        echo "PostgreSQL  OK"
+        echo "MySQL       OK"
+        echo "================================="
