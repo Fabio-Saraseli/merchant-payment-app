@@ -5,6 +5,10 @@ import FormField from "./ui/FormField";
 import Input from "./ui/Input";
 import SectionHeader from "./ui/SectionHeader";
 
+const formatTransactionDate = (createdAt: string) => {
+  return new Date(createdAt).toLocaleString();
+};
+
 function TransactionHistory() {
   const {
     transactions,
@@ -19,7 +23,7 @@ function TransactionHistory() {
   } = useTransactions();
 
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+    <section>
       <SectionHeader
         title="Transaction History"
         description="Review and filter previous payment transactions."
@@ -88,7 +92,7 @@ function TransactionHistory() {
             {transactions.map((transaction) => (
               <tr key={transaction.id}>
                 <td className="whitespace-nowrap px-3 py-4 text-slate-600">
-                  {transaction.created_at}
+                  {formatTransactionDate(transaction.created_at)}
                 </td>
 
                 <td className="px-3 py-4 text-slate-900">

@@ -88,4 +88,14 @@ class Transaction
     {
         return $this->createdAt;
     }
+
+    public function getCreatedAtIso()
+    {
+        $date = new \DateTimeImmutable(
+            $this->createdAt,
+            new \DateTimeZone('UTC')
+        );
+
+        return $date->format('Y-m-d\TH:i:s\Z');
+    }
 }

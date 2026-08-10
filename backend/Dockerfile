@@ -28,6 +28,7 @@ COPY public ./public
 COPY src ./src
 COPY bin ./bin
 COPY database ./database
+COPY config ./config
 
 EXPOSE 8080
 

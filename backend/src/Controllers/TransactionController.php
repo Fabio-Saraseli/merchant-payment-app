@@ -54,7 +54,7 @@ class TransactionController
                 'card_last_four' => $transaction->getCardLastFour(),
                 'status' => $transaction->getStatus(),
                 'provider_transaction_id' => $transaction->getProviderTransactionId(),
-                'created_at' => $transaction->getCreatedAt(),
+                'created_at' => $transaction->getCreatedAtIso(),
             ];
         }
 

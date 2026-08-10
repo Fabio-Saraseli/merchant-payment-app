@@ -21,6 +21,7 @@ RUN composer install \
     --prefer-dist
 
 COPY src ./src
+COPY config ./config
 COPY tests ./tests
 COPY database ./database
 COPY phpunit.xml ./
