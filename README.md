@@ -1,12 +1,17 @@
 # Merchant Payment Application
 
-A small payment-processing application consisting of a vanilla PHP MVC API, a React TypeScript frontend, and a PostgreSQL database.
+A small payment-processing application consisting of a vanilla PHP MVC API and a React TypeScript frontend.
+
+You can select the storage mechanism when starting the project. At the moment the app supports and has been tested with PostgreSQL, MySQL and SQLite.
 
 ## Technology stack
 
 - PHP 8.3
 - Composer
+- PDO
 - PostgreSQL 17
+- MySQL 8
+- SQLite
 - React
 - TypeScript
 - Vite
@@ -20,7 +25,7 @@ To run the app, you only need:
 - Git
 - Docker Desktop with Docker Compose
 
-PHP, Composer, Node.js, npm, and PostgreSQL do not need to be installed locally.
+PHP, Composer, Node.js, npm and the databases do not need to be installed locally.
 
 ## Clone the repository
 
@@ -31,18 +36,43 @@ cd merchant-payment-app
 
 ## Run the application
 
-Build and start the frontend, backend, and database all at once:
+Before starting the project choose which database you want to use.
+
+The base `docker-compose.yml` contains the application itself and the second compose file provides the selected database configuration.
+
+### PostgreSQL
 
 ```bash
-docker compose up --build
+docker compose \
+  -f docker-compose.yml \
+  -f docker-compose.postgres.yml \
+  up --build
+```
+
+### MySQL
+
+```bash
+docker compose \
+  -f docker-compose.yml \
+  -f docker-compose.mysql.yml \
+  up --build
+```
+
+### SQLite
+
+```bash
+docker compose \
+  -f docker-compose.yml \
+  -f docker-compose.sqlite.yml \
+  up --build
 ```
 
 After the services start, open:
 
-- Frontend: http://localhost:5173
-- Backend API: http://localhost:8080
+- Frontend: [http://localhost:5173](http://localhost:5173)
+- Backend API: [http://localhost:8080](http://localhost:8080)
 
-The backend currently returns:
+The backend health endpoint returns:
 
 ```json
 {
@@ -53,34 +83,119 @@ The backend currently returns:
 
 ## Run in the background
 
-Start all services without keeping the logs open:
+Just add `-d` to whichever database configuration you selected.
+
+For example with PostgreSQL:
 
 ```bash
-docker compose up --build -d
+docker compose \
+  -f docker-compose.yml \
+  -f docker-compose.postgres.yml \
+  up --build -d
 ```
 
-See the status of the services:
+For MySQL:
 
 ```bash
-docker compose ps
+docker compose \
+  -f docker-compose.yml \
+  -f docker-compose.mysql.yml \
+  up --build -d
 ```
 
-See the application logs:
+For SQLite:
 
 ```bash
-docker compose logs -f
+docker compose \
+  -f docker-compose.yml \
+  -f docker-compose.sqlite.yml \
+  up --build -d
 ```
+
+## Check the services
+
+Use the same compose files that you used when starting the app.
+
+For example for PostgreSQL:
+
+```bash
+docker compose \
+  -f docker-compose.yml \
+  -f docker-compose.postgres.yml \
+  ps
+```
+
+For MySQL:
+
+```bash
+docker compose \
+  -f docker-compose.yml \
+  -f docker-compose.mysql.yml \
+  ps
+```
+
+For SQLite:
+
+```bash
+docker compose \
+  -f docker-compose.yml \
+  -f docker-compose.sqlite.yml \
+  ps
+```
+
+## Application logs
+
+For example with PostgreSQL:
+
+```bash
+docker compose \
+  -f docker-compose.yml \
+  -f docker-compose.postgres.yml \
+  logs -f
+```
+
+same idea for MySQL or SQLite, just use the corresponding compose file.
 
 ## Stop the app
 
-If you want to stop and remove the containers:
+Use the same database config that was used to start it.
+
+PostgreSQL:
 
 ```bash
-docker compose down
+docker compose \
+  -f docker-compose.yml \
+  -f docker-compose.postgres.yml \
+  down --remove-orphans
 ```
 
-To stop the application and delete all stored database data:
+MySQL:
 
 ```bash
-docker compose down -v
+docker compose \
+  -f docker-compose.yml \
+  -f docker-compose.mysql.yml \
+  down --remove-orphans
 ```
+
+SQLite:
+
+```bash
+docker compose \
+  -f docker-compose.yml \
+  -f docker-compose.sqlite.yml \
+  down --remove-orphans
+```
+
+If you also want to delete the stored data for that database, add `-v`.
+
+For example:
+
+```bash
+docker compose \
+  -f docker-compose.yml \
+  -f docker-compose.postgres.yml \
+  down -v --remove-orphans
+```
+
+Be careful with `-v` because it deletes the Docker volume and therefore the stored database data.
