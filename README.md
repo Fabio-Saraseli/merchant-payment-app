@@ -23,7 +23,7 @@ You can select the storage mechanism when starting the project. At the moment th
 To run the app, you only need:
 
 - Git
-- Docker Desktop with Docker Compose
+- [Docker Desktop](https://docs.docker.com/get-started/get-docker/) with Docker Compose
 
 PHP, Composer, Node.js, npm and the databases do not need to be installed locally.
 
