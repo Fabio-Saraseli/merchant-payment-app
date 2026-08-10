@@ -1,7 +1,7 @@
 <?php
 
-namespace App\Payments;
-
+namespace App\Payments\Providers;
+use App\Payments\PaymentProviderInterface;
 class FakeStripeProvider implements PaymentProviderInterface
 {
     public function getName()

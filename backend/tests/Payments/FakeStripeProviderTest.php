@@ -1,6 +1,6 @@
 <?php
 
-use App\Payments\FakeStripeProvider;
+use App\Payments\Providers\FakeStripeProvider;
 use PHPUnit\Framework\TestCase;
 
 class FakeStripeProviderTest extends TestCase
